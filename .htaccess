@@ -1,0 +1,30 @@
+# MAB Shop - Apache URL Rewriting for SEO-friendly URLs
+RewriteEngine On
+RewriteBase /Shop/
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(config|includes|classes|database)">
+    Require all denied
+</FilesMatch>
+
+# SEO-friendly product URLs: /product/slug-name
+RewriteRule ^product/([a-z0-9-]+)/?$ product.php?slug=$1 [L,QSA]
+
+# Category URLs: /category/slug-name
+RewriteRule ^category/([a-z0-9-]+)/?$ products.php?category_slug=$1 [L,QSA]
+
+# Block access to .sql files
+<FilesMatch "\.sql$">
+    Require all denied
+</FilesMatch>
