@@ -13,6 +13,9 @@ RewriteBase /Shop/
 # Prevent directory listing
 Options -Indexes
 
+# Prefer PHP index over HTML index
+DirectoryIndex index.php index.html
+
 # Protect sensitive files
 <FilesMatch "^(config|includes|classes|database)">
     Require all denied

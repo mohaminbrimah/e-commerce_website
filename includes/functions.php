@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MAB Shop - Helper Functions
  * URL generation, formatting, notifications, and common utilities

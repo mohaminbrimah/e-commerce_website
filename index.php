@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MAB Shop - Homepage
  * Featured products, categories, hero banner, and recommendations
@@ -10,6 +11,15 @@ $productModel = new Product();
 $featured = $productModel->getFeatured(8);
 $recentlyViewed = $productModel->getRecentlyViewed(6);
 $filterOptions = $productModel->getFilterOptions();
+
+// Ensure featured products resolve to local assets in /assets/images
+foreach ($featured as $i => $p) {
+    // If product has no image or the image file referenced doesn't exist, try resolving via helper
+    $candidate = $p['image'] ?? null;
+    if (empty($candidate) || !file_exists(ROOT_PATH . '/' . ltrim((string)$candidate, '/'))) {
+        $featured[$i]['image'] = productImagePath($candidate ?? null, $p['slug'] ?? null);
+    }
+}
 
 $pageTitle = 'Home';
 $metaDescription = 'MAB Shop - Premium online shopping in Ghana. Electronics, fashion, footwear and more.';
@@ -38,8 +48,8 @@ include ROOT_PATH . '/templates/header.php';
                 <div class="hero-product-grid" aria-label="Featured product images">
                     <img src="<?= url('assets/images/iphone14.jpg') ?>" alt="iPhone 14" class="hero-product hero-product-large">
                     <img src="<?= url('assets/images/nike_air_max90.jpg') ?>" alt="Nike Air Max 90" class="hero-product">
-                    <img src="<?= url('assets/images/sony_wh-1000xm5.jpg') ?>" alt="Sony headphones" class="hero-product">
-                    <img src="<?= url('assets/images/adidas_ultraboost22.jpg') ?>" alt="Adidas Ultraboost 22" class="hero-product">
+                    <img src="<?= url('assets/images/sony_wh-1000xm5.jpg') ?>" alt="Sony headphones" class="hero-product contain sony">
+                    <img src="<?= url('assets/images/adidas_ultraboost22.jpg') ?>" alt="Adidas Ultraboost 22" class="hero-product contain adidas">
                 </div>
             </div>
         </div>
@@ -52,12 +62,12 @@ include ROOT_PATH . '/templates/header.php';
         <h2 class="fw-bold mb-4">Shop by Category</h2>
         <div class="row g-3">
             <?php foreach (array_filter($filterOptions['categories'], fn($c) => !$c['parent_id']) as $cat): ?>
-            <div class="col-6 col-md-4 col-lg-3">
-                <a href="<?= url('products.php?category=' . $cat['id']) ?>" class="card text-center p-4 text-decoration-none h-100 border-0 shadow-sm category-card">
-                    <i class="bi bi-grid fs-1 text-primary mb-2"></i>
-                    <h6 class="mb-0 text-body"><?= e($cat['name']) ?></h6>
-                </a>
-            </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a href="<?= url('products.php?category=' . $cat['id']) ?>" class="card text-center p-4 text-decoration-none h-100 border-0 shadow-sm category-card">
+                        <i class="bi bi-grid fs-1 text-primary mb-2"></i>
+                        <h6 class="mb-0 text-body"><?= e($cat['name']) ?></h6>
+                    </a>
+                </div>
             <?php endforeach; ?>
         </div>
     </section>
@@ -70,34 +80,50 @@ include ROOT_PATH . '/templates/header.php';
         </div>
         <div class="row g-4">
             <?php foreach ($featured as $product): ?>
-            <div class="col-6 col-md-4 col-lg-3">
-                <?php include ROOT_PATH . '/templates/product-card.php'; ?>
-            </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <?php include ROOT_PATH . '/templates/product-card.php'; ?>
+                </div>
             <?php endforeach; ?>
         </div>
     </section>
 
     <!-- Recently Viewed -->
     <?php if (!empty($recentlyViewed)): ?>
-    <section class="mb-5">
-        <h2 class="fw-bold mb-4">Recently Viewed</h2>
-        <div class="row g-4">
-            <?php foreach ($recentlyViewed as $product): ?>
-            <div class="col-6 col-md-4 col-lg-2">
-                <?php include ROOT_PATH . '/templates/product-card.php'; ?>
+        <section class="mb-5">
+            <h2 class="fw-bold mb-4">Recently Viewed</h2>
+            <div class="row g-4">
+                <?php foreach ($recentlyViewed as $product): ?>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <?php include ROOT_PATH . '/templates/product-card.php'; ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
-        </div>
-    </section>
+        </section>
     <?php endif; ?>
 
     <!-- Trust badges -->
     <section class="mb-5">
         <div class="row g-4 text-center">
-            <div class="col-md-3"><div class="stat-card"><i class="bi bi-truck stat-icon text-primary"></i><h6 class="mt-2">Fast Delivery</h6></div></div>
-            <div class="col-md-3"><div class="stat-card"><i class="bi bi-shield-check stat-icon text-success"></i><h6 class="mt-2">Secure Payments</h6></div></div>
-            <div class="col-md-3"><div class="stat-card"><i class="bi bi-arrow-repeat stat-icon text-warning"></i><h6 class="mt-2">Easy Returns</h6></div></div>
-            <div class="col-md-3"><div class="stat-card"><i class="bi bi-headset stat-icon text-info"></i><h6 class="mt-2">24/7 Support</h6></div></div>
+            <div class="col-md-3">
+                <div class="stat-card"><i class="bi bi-truck stat-icon text-primary"></i>
+                    <h6 class="mt-2">Fast Delivery</h6>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card"><i class="bi bi-shield-check stat-icon text-success"></i>
+                    <h6 class="mt-2">Secure Payments</h6>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card"><i class="bi bi-arrow-repeat stat-icon text-warning"></i>
+                    <h6 class="mt-2">Easy Returns</h6>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card"><i class="bi bi-headset stat-icon text-info"></i>
+                    <h6 class="mt-2">24/7 Support</h6>
+                </div>
+            </div>
         </div>
     </section>
 </div>

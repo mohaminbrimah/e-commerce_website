@@ -141,6 +141,13 @@ body {
 }
 .hero-product-large { grid-row: span 2; height: 315px; }
 
+/* Use contain for products that must fit fully without cropping */
+.hero-product.contain {
+    object-fit: contain;
+    object-position: center;
+    background: white;
+}
+
 /* Star ratings */
 .star-rating i { font-size: 0.85rem; }
 

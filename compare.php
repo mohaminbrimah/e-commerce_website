@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MAB Shop - Product Comparison Page
  */
@@ -34,23 +35,41 @@ include ROOT_PATH . '/templates/header.php';
 <div class="container py-4">
     <h1 class="fw-bold mb-4">Compare Products</h1>
     <?php if (count($products) < 2): ?>
-    <p class="text-muted">Add at least 2 products to compare. <a href="<?= url('products.php') ?>">Browse products</a></p>
+        <p class="text-muted">Add at least 2 products to compare. <a href="<?= url('products.php') ?>">Browse products</a></p>
     <?php else: ?>
-    <div class="table-responsive">
-        <table class="table compare-table">
-            <thead><tr><th>Feature</th><?php foreach ($products as $p): ?><th class="text-center"><img src="<?= url(productImagePath($p['image'] ?? null, $p['slug'] ?? null)) ?>" width="80" class="rounded mb-2"><br><?= e($p['name']) ?></th><?php endforeach; ?></tr></thead>
-            <tbody>
-                <tr><td><strong>Price</strong></td><?php foreach ($products as $p): ?><td class="text-center fw-bold text-primary"><?= formatPrice((float)$p['price']) ?></td><?php endforeach; ?></tr>
-                <tr><td><strong>Rating</strong></td><?php foreach ($products as $p): ?><td class="text-center"><?= renderStars((float)$p['rating_avg']) ?></td><?php endforeach; ?></tr>
-                <tr><td><strong>Brand</strong></td><?php foreach ($products as $p): $bStmt = $pdo->prepare('SELECT name FROM brands WHERE id = ?'); $bStmt->execute([(int)($p['brand_id'] ?? 0)]); $b = $bStmt->fetch(); ?><td class="text-center"><?= e($b['name'] ?? 'N/A') ?></td><?php endforeach; ?></tr>
-                <tr><td><strong>Stock</strong></td><?php foreach ($products as $p): $s = getStockStatus((int)$p['stock_quantity']); ?><td class="text-center"><span class="badge bg-<?= $s['class'] ?>"><?= $s['label'] ?></span></td><?php endforeach; ?></tr>
-                <?php foreach ($allSpecs as $key => $values): ?>
-                <tr><td><strong><?= e($key) ?></strong></td><?php foreach ($products as $p): ?><td class="text-center <?= count(array_unique($values)) > 1 && isset($values[$p['id']]) ? 'compare-highlight' : '' ?>"><?= e($values[$p['id']] ?? '-') ?></td><?php endforeach; ?></tr>
-                <?php endforeach; ?>
-                <tr><td></td><?php foreach ($products as $p): ?><td class="text-center"><button class="btn btn-primary btn-sm add-to-cart-btn" data-id="<?= (int)$p['id'] ?>">Add to Cart</button></td><?php endforeach; ?></tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="table-responsive">
+            <table class="table compare-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th><?php foreach ($products as $p): ?><th class="text-center"><img src="<?= e(productImagePath($p['image'] ?? null, $p['slug'] ?? null)) ?>" width="80" class="rounded mb-2"><br><?= e($p['name']) ?></th><?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Price</strong></td><?php foreach ($products as $p): ?><td class="text-center fw-bold text-primary"><?= formatPrice((float)$p['price']) ?></td><?php endforeach; ?>
+                    </tr>
+                    <tr>
+                        <td><strong>Rating</strong></td><?php foreach ($products as $p): ?><td class="text-center"><?= renderStars((float)$p['rating_avg']) ?></td><?php endforeach; ?>
+                    </tr>
+                    <tr>
+                        <td><strong>Brand</strong></td><?php foreach ($products as $p): $bStmt = $pdo->prepare('SELECT name FROM brands WHERE id = ?');
+                                                            $bStmt->execute([(int)($p['brand_id'] ?? 0)]);
+                                                            $b = $bStmt->fetch(); ?><td class="text-center"><?= e($b['name'] ?? 'N/A') ?></td><?php endforeach; ?>
+                    </tr>
+                    <tr>
+                        <td><strong>Stock</strong></td><?php foreach ($products as $p): $s = getStockStatus((int)$p['stock_quantity']); ?><td class="text-center"><span class="badge bg-<?= $s['class'] ?>"><?= $s['label'] ?></span></td><?php endforeach; ?>
+                    </tr>
+                    <?php foreach ($allSpecs as $key => $values): ?>
+                        <tr>
+                            <td><strong><?= e($key) ?></strong></td><?php foreach ($products as $p): ?><td class="text-center <?= count(array_unique($values)) > 1 && isset($values[$p['id']]) ? 'compare-highlight' : '' ?>"><?= e($values[$p['id']] ?? '-') ?></td><?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td></td><?php foreach ($products as $p): ?><td class="text-center"><button class="btn btn-primary btn-sm add-to-cart-btn" data-id="<?= (int)$p['id'] ?>">Add to Cart</button></td><?php endforeach; ?>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </div>
 <?php include ROOT_PATH . '/templates/footer.php'; ?>
